@@ -1,6 +1,17 @@
-class Chatbot:
+import json
+
+
+class Chatbot():
+    try:
+        memory = open('Filipe.json', 'r')
+    except FileNotFoundError:
+        memory = open('Filipe.json', 'w')
+        memory.write('["Filipe", "Rann"]')
+        memory.close()
+        memory = open('Filipe.json', 'r')
+    know_people = json.load(memory)
+    memory.close()
     historic = []
-    know_people = ['Filipe', 'Davi', 'Rann']
 
     def __int__(self, name):
         self.name = name
@@ -27,6 +38,10 @@ class Chatbot:
             frase = 'Welcome '
         else:
             frase = 'Nice to meet you '
+            self.know_people.append(name)
+            memory = open('Filipe.json', 'w')
+            json.dump(self.know_people, memory)
+            memory.close()
         return frase + name
 
     def catch_name(self, name):
