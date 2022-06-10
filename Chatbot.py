@@ -1,4 +1,7 @@
 import json
+import sys
+import os
+import subprocess as sub
 
 
 class Chatbot():
@@ -6,12 +9,12 @@ class Chatbot():
         memory = open('Filipe.json', 'r')
     except FileNotFoundError:
         memory = open('Filipe.json', 'w')
-        memory.write('["Filipe", "Rann"]')
+        memory.write('[["Filipe", "Rann"], {"hi": "Hey, what is your name?", "bye": "bye"}]')
         memory.close()
         memory = open('Filipe.json', 'r')
-    know_people = json.load(memory)
+    know_people, frases = json.load(memory)
     memory.close()
-    historic = []
+    historic = [None,]
 
     def __int__(self, name):
         self.name = name
@@ -19,18 +22,29 @@ class Chatbot():
     def listening(self):
         # Take the user's answers and processing it
         frase = input('>: ')
+        if 'execute' in frase:
+            return frase
         frase = frase.lower()
         return frase
 
     def think(self, frase):
-        if frase == 'hi':
-            return 'Hey, what is your name?'
+        if frase in self.frases:
+            return self.frases[frase]
+        if frase == 'learn':
+            key = input('Write a frase: ')
+            ans1 = input('Write a answer: ')
+            self.frases[key] = ans1
+            self.write_memory()
+            return 'Learned!'
         if self.historic[-1] == 'Hey, what is your name?':
             name = self.catch_name(frase)
             ans = self.answer_name(name)
             return ans
-        if frase == 'bye':
-            return 'bye'
+        try:
+            ans = str(eval(frase))
+            return ans
+        except:
+            pass
         return 'I cannot understand'
 
     def answer_name(self, name):
@@ -39,9 +53,7 @@ class Chatbot():
         else:
             frase = 'Nice to meet you '
             self.know_people.append(name)
-            memory = open('Filipe.json', 'w')
-            json.dump(self.know_people, memory)
-            memory.close()
+            self.write_memory()
         return frase + name
 
     def catch_name(self, name):
@@ -50,6 +62,22 @@ class Chatbot():
         name = name.title()
         return name
 
+    def write_memory(self):
+        memory = open('Filipe.json', 'w')
+        json.dump([self.know_people, self.frases], memory)
+        memory.close()
+
     def speak(self, frase):
-        print(frase)
+        if 'execute ' in frase:
+            plform = sys.platform
+            comand = frase.replace('execute ', '')
+            if 'win' in plform:
+                os.startfile(comand)
+            if 'linux' in plform:
+                try:
+                    sub.Popen(comand)
+                except FileNotFoundError:
+                    sub.Popen(['xdg-open', comand])
+        else:
+            print(frase)
         self.historic.append(frase)
