@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import wikipedia
 import subprocess as sub
 
 
@@ -19,15 +20,22 @@ class Chatbot():
     def __int__(self, name):
         self.name = name
 
-    def listening(self):
-        # Take the user's answers and processing it
-        frase = input('>: ')
+    def listening(self, frase):
         if 'execute' in frase:
             return frase
         frase = frase.lower()
         return frase
 
     def think(self, frase):
+        if "what is " in frase or "what's " in frase:
+            frase = frase.title()
+            term = frase.replace('What Is ', '').replace("What's ", '').strip()
+            try:
+                return wikipedia.summary(term, sentences=1)
+            except wikipedia.exceptions.DisambiguationError as e:
+                return str(e.options)
+            except wikipedia.PageError as e_1:
+                return str(e_1)
         if frase in self.frases:
             return self.frases[frase]
         if frase == 'learn':
