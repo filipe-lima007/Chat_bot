@@ -1,18 +1,20 @@
 import json
 import sys
 import os
-import wikipedia
 import subprocess as sub
+import wikipedia
+
+abs_path = os.path.dirname(__file__)
 
 
 class Chatbot():
     try:
-        memory = open('Filipe.json', 'r')
+        memory = open(abs_path+r'Filipe.json', 'r')
     except FileNotFoundError:
-        memory = open('Filipe.json', 'w')
+        memory = open(abs_path+r'Filipe.json', 'w')
         memory.write('[["Filipe", "Rann"], {"hi": "Hey, what is your name?", "bye": "bye"}]')
         memory.close()
-        memory = open('Filipe.json', 'r')
+        memory = open(abs_path+r'Filipe.json', 'r')
     know_people, frases = json.load(memory)
     memory.close()
     historic = [None,]
@@ -71,7 +73,7 @@ class Chatbot():
         return name
 
     def write_memory(self):
-        memory = open('Filipe.json', 'w')
+        memory = open(abs_path+r'Filipe.json', 'w')
         json.dump([self.know_people, self.frases], memory)
         memory.close()
 
